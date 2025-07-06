@@ -134,9 +134,72 @@ for i in range(9):
     sudoku.append(sudoku_digit_row)
     print(sudoku_digit_row)
 
+sudoku = [[5, 3, 0, 0, 7, 0, 0, 0, 0],   
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],   
+        [0, 9, 8, 0, 0, 0, 0, 6, 0],   
+        [8, 0, 0, 0, 6, 0, 0, 0, 3],   
+        [4, 0, 0, 8, 0, 3, 0, 0, 1],   
+        [7, 0, 0, 0, 2, 0, 0, 0, 6],   
+        [0, 6, 0, 0, 0, 0, 2, 8, 0],   
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],   
+        [0, 0, 0, 0, 8, 0, 0, 7, 9]]   
+
+## Helper function to check if the value put is a valid/Solved one or not
+def isValid(sudoku, i, j, k):
+    for l in range(9):
+        if(sudoku[i][l] == k): 
+            return False
+        if(sudoku[l][j] == k): 
+            return False
+        
+    for l in range(3):
+        for m in range(3):
+            if(sudoku[l + (i // 3) * 3][m + (j // 3) * 3] == k): 
+                return False
+    return True
+
+
+def Solved(sudoku):
+    for i in range(9):
+        for j in range(9):
+            if(sudoku[i][j] == 0):
+                return False
+            val = sudoku[i][j]
+            sudoku[i][j] = 0 
+            if(not (isValid(sudoku, i, j, val))):
+                 return False
+            sudoku[i][j] = val
+    return True
+
 ## Finally after getting the sudoku from the Image, solve it using Back Tracking.
+global _break
+_break =  False
+def SudokuSolver(sudoku, i = 0, j = 0):   
+    global _break
 
-# print(sudoku)
+    if(j == 9):
+        j = 0
+        i = i + 1
 
-cv2.imshow("Cropped_gray_cropped_image", bitwise_not_thres_img)
-cv2.waitKey(0)
+    if(i == 9):
+        if(Solved(sudoku)):
+            _break = True
+        return  
+    if(sudoku[i][j] == 0):
+        for k in range(1, 10):
+            if(isValid(sudoku, i, j, k)):
+                sudoku[i][j] = k
+                SudokuSolver(sudoku, i, j + 1)
+                if(_break == True):
+                    return
+        sudoku[i][j] = 0
+    else: 
+        SudokuSolver(sudoku, i, j + 1)
+
+SudokuSolver(sudoku, 0, 0)  
+print("\nSolved Sudoku:\n")
+for i in range(9):
+    print(sudoku[i])
+
+# cv2.imshow("Cropped_gray_cropped_image", bitwise_not_thres_img)
+# cv2.waitKey(0)
